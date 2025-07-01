@@ -1,11 +1,10 @@
 {
-  "name": "Ultra Converter™",
+  "name": "Ultra Currency Converter",
   "short_name": "Converter",
-  "description": "Convert multiple currencies worldwide with Ultra style.",
-  "start_url": "/",
+  "start_url": "/Currency-Converter/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#00B0FF",
+  "theme_color": "#7f9cf5",
   "icons": [
     {
       "src": "icon-192.png",
