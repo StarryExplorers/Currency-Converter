@@ -106,32 +106,31 @@
     });
     fromSel.value="USD"; toSel.value="PKR";
 
-    async function doConvert() {
-  const from = document.getElementById('from').value;
-  const to = document.getElementById('to').value;
-  const amount = parseFloat(document.getElementById('amount').value);
-  const resultElement = document.getElementById('result');
+async function doConvert() {
+  const amt = parseFloat(document.getElementById('amount').value);
+  const from = fromSel.value;
+  const to = toSel.value;
+  const resultEl = document.getElementById('result');
 
-  if (isNaN(amount)) {
-    resultElement.textContent = "Please enter a valid number.";
+  if (isNaN(amt)) {
+    resultEl.textContent = 'Please enter a valid number.';
     return;
   }
 
   try {
-    const res = await fetch(`https://api.exchangerate.host/latest?base=${from}`);
+    const res = await fetch(`https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amt}`);
     const data = await res.json();
-    const rate = data.rates[to];
 
-    if (!rate) {
-      resultElement.textContent = "Invalid conversion!";
-      return;
-    }
-
-    const converted = (amount * rate).toFixed(2);
-    resultElement.textContent = `${amount} ${from} = ${converted} ${to}`;
+    if (!data.success) throw 'Conversion failed';
+    const conv = data.result.toFixed(2);
+    resultEl.textContent = `= ${conv} ${to}`;
+    localStorage.setItem(
+      'lastConversion',
+      JSON.stringify({amt, from, to, conv})
+    );
   } catch (err) {
-    resultElement.textContent = "Error fetching exchange rate.";
-    console.error(err);
+    resultEl.textContent = 'Error fetching exchange rate.';
+    console.error('Convert error:', err);
   }
 }
     
