@@ -127,36 +127,45 @@
       from.appendChild(option1);
       to.appendChild(option2);
     });
+
     from.value = "USD";
     to.value = "INR";
 
     async function convertCurrency() {
-  const amt = parseFloat(document.getElementById("amount").value);
-  const fromCurr = from.value;
-  const toCurr = to.value;
-  if (!amt || amt <= 0) {
-    result.textContent = "Please enter a valid amount.";
-    return;
-  }
+      const amt = parseFloat(document.getElementById("amount").value);
+      const fromCurr = from.value;
+      const toCurr = to.value;
 
-  const url = `https://free.ratesdb.com/v1/rates?from=${fromCurr}&to=${toCurr}`;
+      if (!amt || amt <= 0) {
+        result.textContent = "Please enter a valid amount.";
+        return;
+      }
 
-  try {
-    const res = await fetch(url);
-    const json = await res.json();
+      result.textContent = "Converting...";
 
-    if (json.data && json.data.rates && json.data.rates[toCurr] != null) {
-      const rate = json.data.rates[toCurr];
-      const converted = (amt * rate).toFixed(2);
-      result.textContent = `${amt} ${fromCurr} = ${converted} ${toCurr} (1 ${fromCurr} = ${rate} ${toCurr})`;
-    } else {
-      throw new Error("Rate unavailable");
+      try {
+        const response = await fetch(
+          `https://api.apilayer.com/exchangerates_data/convert?from=${fromCurr}&to=${toCurr}&amount=${amt}`,
+          {
+            headers: {
+              apikey: "mxadyU1vNXfygVETZ4EXsECf9E2qZFv3"
+            }
+          }
+        );
+
+        const data = await response.json();
+
+        if (!data.success) {
+          throw new Error(data.error?.info || "Failed to fetch exchange rate");
+        }
+
+        const converted = data.result;
+        result.textContent = `${amt} ${fromCurr} = ${converted.toFixed(2)} ${toCurr} (1 ${fromCurr} = ${data.info.rate} ${toCurr})`;
+      } catch (err) {
+        console.error(err);
+        result.textContent = "Error converting currency. Please try again.";
+      }
     }
-  } catch (err) {
-    console.error("RatesDB error:", err);
-    result.textContent = "Error converting currency. Try again.";
-  }
-}
 
     function setTheme(theme) {
       document.body.className = theme;
@@ -164,9 +173,7 @@
     }
 
     const savedTheme = localStorage.getItem("ultra-theme");
-    if (savedTheme) {
-      setTheme(savedTheme);
-    }
+    if (savedTheme) setTheme(savedTheme);
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js');
