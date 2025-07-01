@@ -163,7 +163,7 @@
         result.textContent = `${amt} ${fromCurr} = ${converted.toFixed(2)} ${toCurr} (1 ${fromCurr} = ${data.info.rate} ${toCurr})`;
       } catch (err) {
         console.error(err);
-        result.textContent = "Error converting currency. Please try again.";
+        result.textContent = "❌Error converting currency. Please try again.";
       }
     }
 
