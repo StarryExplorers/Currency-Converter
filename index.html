@@ -106,22 +106,35 @@
     });
     fromSel.value="USD"; toSel.value="PKR";
 
-    async function doConvert(){
-      let amt=parseFloat(document.getElementById("amount").value);
-      if(isNaN(amt)){ return alert("Enter a number!"); }
-      let from=fromSel.value, to=toSel.value;
-      try {
-        let res = await fetch(`https://open.er-api.com/v6/latest/${from}`);
-        let data = await res.json();
-        if(data.result !== "success") throw "API error";
-        let rate = data.rates[to];
-        let conv = (amt * rate).toFixed(2);
-        document.getElementById("result").textContent = `= ${conv} ${to}`;
-        localStorage.setItem("lastConversion", JSON.stringify({amt,from,to,conv}));
-      } catch {
-        document.getElementById("result").textContent = "Error loading rates 😢";
-      }
+    async function doConvert() {
+  const from = document.getElementById('from').value;
+  const to = document.getElementById('to').value;
+  const amount = parseFloat(document.getElementById('amount').value);
+  const resultElement = document.getElementById('result');
+
+  if (isNaN(amount)) {
+    resultElement.textContent = "Please enter a valid number.";
+    return;
+  }
+
+  try {
+    const res = await fetch(`https://api.exchangerate.host/latest?base=${from}`);
+    const data = await res.json();
+    const rate = data.rates[to];
+
+    if (!rate) {
+      resultElement.textContent = "Invalid conversion!";
+      return;
     }
+
+    const converted = (amount * rate).toFixed(2);
+    resultElement.textContent = `${amount} ${from} = ${converted} ${to}`;
+  } catch (err) {
+    resultElement.textContent = "Error fetching exchange rate.";
+    console.error(err);
+  }
+}
+    
 
     function changeTheme(n){
       document.body.className = `theme-${n}`;
