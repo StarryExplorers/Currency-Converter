@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ultra Converter™</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192.png" />
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      transition: 0.5s;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      padding: 2rem;
+      text-align: center;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+    }
+    button {
+      background: #4c51bf;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    #result {
+      margin-top: 1rem;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    .theme-selector {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+    .theme-selector button {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+    }
+
+    body.theme-1 { background: linear-gradient(to right, #0f2027, #203a43, #2c5364); color: #fff; }
+    body.theme-2 { background: linear-gradient(to right, #141e30, #243b55); color: #fff; }
+    body.theme-3 { background: linear-gradient(to right, #ff512f, #dd2476); color: #fff; }
+    body.theme-4 { background: linear-gradient(to right, #00b09b, #96c93d); color: #fff; }
+    body.theme-5 { background: linear-gradient(to right, #8360c3, #2ebf91); color: #fff; }
+    body.theme-6 { background: linear-gradient(to right, #f7971e, #ffd200); color: #000; }
+    body.theme-7 { background: linear-gradient(to right, #11998e, #38ef7d); color: #000; }
+    body.theme-8 { background: linear-gradient(to right, #fc466b, #3f5efb); color: #fff; }
+    body.theme-9 { background: linear-gradient(to right, #667eea, #764ba2); color: #fff; }
+    body.theme-10 { background: linear-gradient(to right, #43cea2, #185a9d); color: #fff; }
+    body.theme-11 { background: linear-gradient(to right, #bdc3c7, #2c3e50); color: #fff; }
+    body.theme-12 { background: linear-gradient(to right, #ff6a00, #ee0979); color: #fff; }
+  </style>
+</head>
+<body class="theme-1">
+  <div class="container">
+    <h1>Ultra Converter™</h1>
+    <input type="number" id="amount" placeholder="Amount" />
+    <select id="from"></select>
+    <select id="to"></select>
+    <button onclick="doConvert()">Convert</button>
+    <div id="result">= ...</div>
+    <div style="font-size: 0.8em; margin-top: 8px;">
+      <a href="https://www.exchangerate-api.com" target="_blank" style="color:#aaa;">Rates By Exchange Rate API</a>
+    </div>
+    <div class="theme-selector">
+      <button style="background: #2c5364" onclick="changeTheme(1)"></button>
+      <button style="background: #243b55" onclick="changeTheme(2)"></button>
+      <button style="background: #dd2476" onclick="changeTheme(3)"></button>
+      <button style="background: #96c93d" onclick="changeTheme(4)"></button>
+      <button style="background: #2ebf91" onclick="changeTheme(5)"></button>
+      <button style="background: #ffd200" onclick="changeTheme(6)"></button>
+      <button style="background: #38ef7d" onclick="changeTheme(7)"></button>
+      <button style="background: #3f5efb" onclick="changeTheme(8)"></button>
+      <button style="background: #764ba2" onclick="changeTheme(9)"></button>
+      <button style="background: #185a9d" onclick="changeTheme(10)"></button>
+      <button style="background: #2c3e50" onclick="changeTheme(11)"></button>
+      <button style="background: #ee0979" onclick="changeTheme(12)"></button>
+    </div>
+  </div>
+  <script>
+    const codes = ["USD","EUR","GBP","INR","PKR","AED","AFN","SGD","HKD","KWD","QAR","BHD",
+      "ILS","RUB","UAH","KES","ZMW","GHS","JPY","CNY","AUD","CAD","KRW","ZAR","BRL",
+      "MXN","MYR","THB","IDR","ARS","VND","BDT","UGX","NOK","SEK","CHF","TRY","EGP"];
+    let fromSel=document.getElementById("from"), toSel=document.getElementById("to");
+    codes.forEach(c=>{
+      fromSel.appendChild(new Option(c,c)); toSel.appendChild(new Option(c,c));
+    });
+    fromSel.value="USD"; toSel.value="PKR";
+
+    async function doConvert(){
+      let amt=parseFloat(document.getElementById("amount").value);
+      if(isNaN(amt)){ return alert("Enter a number!"); }
+      let from=fromSel.value, to=toSel.value;
+      try {
+        let res = await fetch(`https://open.er-api.com/v6/latest/${from}`);
+        let data = await res.json();
+        if(data.result !== "success") throw "API error";
+        let rate = data.rates[to];
+        let conv = (amt * rate).toFixed(2);
+        document.getElementById("result").textContent = `= ${conv} ${to}`;
+        localStorage.setItem("lastConversion", JSON.stringify({amt,from,to,conv}));
+      } catch {
+        document.getElementById("result").textContent = "Error loading rates 😢";
+      }
+    }
+
+    function changeTheme(n){
+      document.body.className = `theme-${n}`;
+      localStorage.setItem("theme", n);
+    }
+
+    window.addEventListener("load", ()=>{
+      let t = localStorage.getItem("theme");
+      if(t) changeTheme(t);
+      let last = JSON.parse(localStorage.getItem("lastConversion")||"null");
+      if(last){
+        document.getElementById("amount").value = last.amt;
+        fromSel.value = last.from;
+        toSel.value = last.to;
+        document.getElementById("result").textContent = `= ${last.conv} ${last.to}`;
+      }
+      if('serviceWorker' in navigator){
+        navigator.serviceWorker.register("service-worker.js");
+      }
+    });
+  </script>
+</body>
+</html>
