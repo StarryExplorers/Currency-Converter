@@ -3,145 +3,162 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ultra Converter</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon-192.png" />
+  <title>Ultra Currency Converter</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
   <style>
-    :root {
-      --bg: linear-gradient(to right, #4facfe, #00f2fe);
-      --text: #fff;
-      --card: rgba(255, 255, 255, 0.1);
-      --accent: #00f2fe;
-    }
+    * { box-sizing: border-box; }
     body {
-      margin: 0;
       font-family: 'Segoe UI', sans-serif;
-      background: var(--bg);
-      color: var(--text);
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: flex-start;
       min-height: 100vh;
-      padding: 2rem;
-      transition: background 0.5s ease;
+      transition: background 0.4s, color 0.4s;
     }
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 2rem;
+    header {
+      width: 100%;
+      padding: 1rem;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: bold;
+      box-shadow: 0 4px 6px #00000022;
     }
     .converter {
-      background: var(--card);
-      backdrop-filter: blur(10px);
+      margin-top: 2rem;
       padding: 2rem;
       border-radius: 1rem;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 12px #00000033;
+      max-width: 400px;
       width: 90%;
-      max-width: 500px;
+      background-color: white;
+      color: black;
     }
-    input, select, button {
+    select, input {
       width: 100%;
-      margin: 0.5rem 0;
       padding: 0.8rem;
-      border-radius: 0.5rem;
-      border: none;
+      margin: 0.5rem 0;
+      border-radius: 0.7rem;
+      border: 1px solid #ccc;
       font-size: 1rem;
     }
     button {
-      background: var(--accent);
-      color: black;
+      width: 100%;
+      padding: 1rem;
+      margin-top: 1rem;
+      background-color: #5a67d8;
+      color: white;
+      border: none;
+      border-radius: 1rem;
+      font-size: 1rem;
       cursor: pointer;
     }
     .result {
-      font-size: 1.5rem;
       margin-top: 1rem;
-      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
     }
     .theme-picker {
       margin-top: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
     }
-    .theme-picker button {
-      margin: 0.2rem;
+    .theme-btn {
       padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
       font-size: 0.9rem;
     }
+    /* Themes */
+    body.default { background: linear-gradient(to right, #7f9cf5, #a78bfa); color: white; }
+    body.sunset { background: linear-gradient(to right, #ff6e7f, #bfe9ff); color: white; }
+    body.forest { background: linear-gradient(to right, #134e4a, #6ee7b7); color: white; }
+    body.midnight { background: #0f172a; color: #e2e8f0; }
+    body.candy { background: linear-gradient(to right, #ff9a9e, #fad0c4); color: black; }
+    body.sky { background: linear-gradient(to right, #2193b0, #6dd5ed); color: white; }
+    body.sunshine { background: linear-gradient(to right, #f6d365, #fda085); color: black; }
+    body.ocean { background: linear-gradient(to right, #00c9ff, #92fe9d); color: black; }
+    body.berry { background: linear-gradient(to right, #654ea3, #eaafc8); color: white; }
+    body.icecream { background: linear-gradient(to right, #fbc2eb, #a6c1ee); color: black; }
   </style>
 </head>
-<body>
-  <h1>Ultra Currency Converter 💱</h1>
+<body class="default">
+  <header>💱 Ultra Currency Converter</header>
   <div class="converter">
-    <input type="number" id="amount" placeholder="Enter amount" />
+    <input type="number" id="amount" placeholder="Enter amount">
     <select id="from"></select>
     <select id="to"></select>
-    <button onclick="doConvert()">Convert</button>
-    <div class="result" id="result">=</div>
+    <button onclick="convertCurrency()">Convert</button>
+    <div class="result" id="result"></div>
   </div>
-
   <div class="theme-picker">
-    <strong>Theme:</strong>
-    <button onclick="setTheme(0)">Ocean</button>
-    <button onclick="setTheme(1)">Sunset</button>
-    <button onclick="setTheme(2)">Midnight</button>
-    <button onclick="setTheme(3)">Mint</button>
-    <button onclick="setTheme(4)">Blossom</button>
+    <button class="theme-btn" onclick="setTheme('default')">🌈 Default</button>
+    <button class="theme-btn" onclick="setTheme('sunset')">🌇 Sunset</button>
+    <button class="theme-btn" onclick="setTheme('forest')">🌲 Forest</button>
+    <button class="theme-btn" onclick="setTheme('midnight')">🌌 Midnight</button>
+    <button class="theme-btn" onclick="setTheme('candy')">🍬 Candy</button>
+    <button class="theme-btn" onclick="setTheme('sky')">🌤️ Sky</button>
+    <button class="theme-btn" onclick="setTheme('sunshine')">☀️ Sunshine</button>
+    <button class="theme-btn" onclick="setTheme('ocean')">🌊 Ocean</button>
+    <button class="theme-btn" onclick="setTheme('berry')">🍓 Berry</button>
+    <button class="theme-btn" onclick="setTheme('icecream')">🍦 Icecream</button>
   </div>
-
   <script>
-    const fromSel = document.getElementById('from');
-    const toSel = document.getElementById('to');
+    const from = document.getElementById("from");
+    const to = document.getElementById("to");
+    const result = document.getElementById("result");
+
     const currencies = [
-      'USD','EUR','GBP','PKR','INR','JPY','CAD','AUD','CHF','SAR','AED','AFN','CNY','SGD'
+      "USD", "EUR", "GBP", "INR", "PKR", "CAD", "AUD", "JPY", "CNY", "CHF",
+      "AED", "AFN", "SAR", "KWD", "THB", "SGD", "MYR", "ZAR", "NOK", "BRL"
     ];
 
-    currencies.forEach(cur => {
-      const opt1 = document.createElement('option');
-      const opt2 = document.createElement('option');
-      opt1.value = opt2.value = cur;
-      opt1.text = opt2.text = cur;
-      fromSel.appendChild(opt1);
-      toSel.appendChild(opt2);
+    currencies.forEach(curr => {
+      const option1 = document.createElement("option");
+      const option2 = document.createElement("option");
+      option1.value = option2.value = curr;
+      option1.text = option2.text = curr;
+      from.appendChild(option1);
+      to.appendChild(option2);
     });
-    fromSel.value = 'USD';
-    toSel.value = 'PKR';
+    from.value = "USD";
+    to.value = "INR";
 
-    async function doConvert() {
-      const amt = parseFloat(document.getElementById('amount').value);
-      const from = fromSel.value;
-      const to = toSel.value;
-      const resultEl = document.getElementById('result');
-
-      if (isNaN(amt)) {
-        resultEl.textContent = 'Please enter a valid number.';
+    async function convertCurrency() {
+      const amt = parseFloat(document.getElementById("amount").value);
+      const fromCurr = from.value;
+      const toCurr = to.value;
+      if (!amt || amt <= 0) {
+        result.textContent = "Please enter a valid amount.";
         return;
       }
-
       try {
-        const res = await fetch(`https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amt}`);
+        const res = await fetch(`https://api.exchangerate.host/convert?from=${fromCurr}&to=${toCurr}&amount=${amt}`);
         const data = await res.json();
-
-        if (!data.success) throw 'Conversion failed';
-        const conv = data.result.toFixed(2);
-        resultEl.textContent = `= ${conv} ${to}`;
-        localStorage.setItem('lastConversion', JSON.stringify({amt, from, to, conv}));
-      } catch (err) {
-        resultEl.textContent = 'Error fetching exchange rate.';
-        console.error('Convert error:', err);
+        if (data.result !== undefined) {
+          result.textContent = `${amt} ${fromCurr} = ${data.result.toFixed(2)} ${toCurr}`;
+        } else {
+          result.textContent = "Error converting currency.";
+        }
+      } catch (e) {
+        result.textContent = "Failed to fetch rates.";
       }
     }
 
-    const themes = [
-      { bg: 'linear-gradient(to right, #4facfe, #00f2fe)', text: '#fff', card: 'rgba(255,255,255,0.1)', accent: '#00f2fe' },
-      { bg: 'linear-gradient(to right, #ff758c, #ff7eb3)', text: '#fff', card: 'rgba(255,255,255,0.2)', accent: '#ffb3c6' },
-      { bg: 'linear-gradient(to right, #0f2027, #203a43, #2c5364)', text: '#fff', card: '#1a1a1a', accent: '#5edfff' },
-      { bg: 'linear-gradient(to right, #c2e9fb, #a1c4fd)', text: '#222', card: 'rgba(255,255,255,0.5)', accent: '#30cfd0' },
-      { bg: 'linear-gradient(to right, #fbc2eb, #a6c1ee)', text: '#333', card: 'rgba(255,255,255,0.3)', accent: '#fbc2eb' },
-    ];
+    function setTheme(theme) {
+      document.body.className = theme;
+      localStorage.setItem("ultra-theme", theme);
+    }
 
-    function setTheme(i) {
-      const t = themes[i];
-      document.documentElement.style.setProperty('--bg', t.bg);
-      document.documentElement.style.setProperty('--text', t.text);
-      document.documentElement.style.setProperty('--card', t.card);
-      document.documentElement.style.setProperty('--accent', t.accent);
+    const savedTheme = localStorage.getItem("ultra-theme");
+    if (savedTheme) {
+      setTheme(savedTheme);
     }
 
     if ('serviceWorker' in navigator) {
