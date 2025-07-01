@@ -3,157 +3,150 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ultra Converter™</title>
+  <title>Ultra Converter</title>
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192.png" />
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --bg: linear-gradient(to right, #4facfe, #00f2fe);
+      --text: #fff;
+      --card: rgba(255, 255, 255, 0.1);
+      --accent: #00f2fe;
     }
     body {
       margin: 0;
-      padding: 0;
       font-family: 'Segoe UI', sans-serif;
-      transition: 0.5s;
-    }
-    .container {
-      max-width: 400px;
-      margin: auto;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
       padding: 2rem;
-      text-align: center;
+      transition: background 0.5s ease;
+    }
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+    }
+    .converter {
+      background: var(--card);
+      backdrop-filter: blur(10px);
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 500px;
     }
     input, select, button {
       width: 100%;
-      padding: 0.8rem;
       margin: 0.5rem 0;
-      border: none;
+      padding: 0.8rem;
       border-radius: 0.5rem;
+      border: none;
       font-size: 1rem;
     }
     button {
-      background: #4c51bf;
-      color: white;
+      background: var(--accent);
+      color: black;
       cursor: pointer;
-      font-weight: bold;
     }
-    #result {
+    .result {
+      font-size: 1.5rem;
       margin-top: 1rem;
-      font-size: 1.2rem;
-      font-weight: bold;
+      text-align: center;
     }
-    .theme-selector {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 0.5rem;
+    .theme-picker {
       margin-top: 2rem;
     }
-    .theme-selector button {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      border: none;
-      cursor: pointer;
+    .theme-picker button {
+      margin: 0.2rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
     }
-
-    body.theme-1 { background: linear-gradient(to right, #0f2027, #203a43, #2c5364); color: #fff; }
-    body.theme-2 { background: linear-gradient(to right, #141e30, #243b55); color: #fff; }
-    body.theme-3 { background: linear-gradient(to right, #ff512f, #dd2476); color: #fff; }
-    body.theme-4 { background: linear-gradient(to right, #00b09b, #96c93d); color: #fff; }
-    body.theme-5 { background: linear-gradient(to right, #8360c3, #2ebf91); color: #fff; }
-    body.theme-6 { background: linear-gradient(to right, #f7971e, #ffd200); color: #000; }
-    body.theme-7 { background: linear-gradient(to right, #11998e, #38ef7d); color: #000; }
-    body.theme-8 { background: linear-gradient(to right, #fc466b, #3f5efb); color: #fff; }
-    body.theme-9 { background: linear-gradient(to right, #667eea, #764ba2); color: #fff; }
-    body.theme-10 { background: linear-gradient(to right, #43cea2, #185a9d); color: #fff; }
-    body.theme-11 { background: linear-gradient(to right, #bdc3c7, #2c3e50); color: #fff; }
-    body.theme-12 { background: linear-gradient(to right, #ff6a00, #ee0979); color: #fff; }
   </style>
 </head>
-<body class="theme-1">
-  <div class="container">
-    <h1>Ultra Converter™</h1>
-    <input type="number" id="amount" placeholder="Amount" />
+<body>
+  <h1>Ultra Currency Converter 💱</h1>
+  <div class="converter">
+    <input type="number" id="amount" placeholder="Enter amount" />
     <select id="from"></select>
     <select id="to"></select>
     <button onclick="doConvert()">Convert</button>
-    <div id="result">= ...</div>
-    <div style="font-size: 0.8em; margin-top: 8px;">
-      <a href="https://www.exchangerate-api.com" target="_blank" style="color:#aaa;">Rates By Exchange Rate API</a>
-    </div>
-    <div class="theme-selector">
-      <button style="background: #2c5364" onclick="changeTheme(1)"></button>
-      <button style="background: #243b55" onclick="changeTheme(2)"></button>
-      <button style="background: #dd2476" onclick="changeTheme(3)"></button>
-      <button style="background: #96c93d" onclick="changeTheme(4)"></button>
-      <button style="background: #2ebf91" onclick="changeTheme(5)"></button>
-      <button style="background: #ffd200" onclick="changeTheme(6)"></button>
-      <button style="background: #38ef7d" onclick="changeTheme(7)"></button>
-      <button style="background: #3f5efb" onclick="changeTheme(8)"></button>
-      <button style="background: #764ba2" onclick="changeTheme(9)"></button>
-      <button style="background: #185a9d" onclick="changeTheme(10)"></button>
-      <button style="background: #2c3e50" onclick="changeTheme(11)"></button>
-      <button style="background: #ee0979" onclick="changeTheme(12)"></button>
-    </div>
+    <div class="result" id="result">=</div>
   </div>
+
+  <div class="theme-picker">
+    <strong>Theme:</strong>
+    <button onclick="setTheme(0)">Ocean</button>
+    <button onclick="setTheme(1)">Sunset</button>
+    <button onclick="setTheme(2)">Midnight</button>
+    <button onclick="setTheme(3)">Mint</button>
+    <button onclick="setTheme(4)">Blossom</button>
+  </div>
+
   <script>
-    const codes = ["USD","EUR","GBP","INR","PKR","AED","AFN","SGD","HKD","KWD","QAR","BHD",
-      "ILS","RUB","UAH","KES","ZMW","GHS","JPY","CNY","AUD","CAD","KRW","ZAR","BRL",
-      "MXN","MYR","THB","IDR","ARS","VND","BDT","UGX","NOK","SEK","CHF","TRY","EGP"];
-    let fromSel=document.getElementById("from"), toSel=document.getElementById("to");
-    codes.forEach(c=>{
-      fromSel.appendChild(new Option(c,c)); toSel.appendChild(new Option(c,c));
+    const fromSel = document.getElementById('from');
+    const toSel = document.getElementById('to');
+    const currencies = [
+      'USD','EUR','GBP','PKR','INR','JPY','CAD','AUD','CHF','SAR','AED','AFN','CNY','SGD'
+    ];
+
+    currencies.forEach(cur => {
+      const opt1 = document.createElement('option');
+      const opt2 = document.createElement('option');
+      opt1.value = opt2.value = cur;
+      opt1.text = opt2.text = cur;
+      fromSel.appendChild(opt1);
+      toSel.appendChild(opt2);
     });
-    fromSel.value="USD"; toSel.value="PKR";
+    fromSel.value = 'USD';
+    toSel.value = 'PKR';
 
-async function doConvert() {
-  const amt = parseFloat(document.getElementById('amount').value);
-  const from = fromSel.value;
-  const to = toSel.value;
-  const resultEl = document.getElementById('result');
+    async function doConvert() {
+      const amt = parseFloat(document.getElementById('amount').value);
+      const from = fromSel.value;
+      const to = toSel.value;
+      const resultEl = document.getElementById('result');
 
-  if (isNaN(amt)) {
-    resultEl.textContent = 'Please enter a valid number.';
-    return;
-  }
+      if (isNaN(amt)) {
+        resultEl.textContent = 'Please enter a valid number.';
+        return;
+      }
 
-  try {
-    const res = await fetch(`https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amt}`);
-    const data = await res.json();
+      try {
+        const res = await fetch(`https://api.exchangerate.host/convert?from=${from}&to=${to}&amount=${amt}`);
+        const data = await res.json();
 
-    if (!data.success) throw 'Conversion failed';
-    const conv = data.result.toFixed(2);
-    resultEl.textContent = `= ${conv} ${to}`;
-    localStorage.setItem(
-      'lastConversion',
-      JSON.stringify({amt, from, to, conv})
-    );
-  } catch (err) {
-    resultEl.textContent = 'Error fetching exchange rate.';
-    console.error('Convert error:', err);
-  }
-}
-    
-
-    function changeTheme(n){
-      document.body.className = `theme-${n}`;
-      localStorage.setItem("theme", n);
+        if (!data.success) throw 'Conversion failed';
+        const conv = data.result.toFixed(2);
+        resultEl.textContent = `= ${conv} ${to}`;
+        localStorage.setItem('lastConversion', JSON.stringify({amt, from, to, conv}));
+      } catch (err) {
+        resultEl.textContent = 'Error fetching exchange rate.';
+        console.error('Convert error:', err);
+      }
     }
 
-    window.addEventListener("load", ()=>{
-      let t = localStorage.getItem("theme");
-      if(t) changeTheme(t);
-      let last = JSON.parse(localStorage.getItem("lastConversion")||"null");
-      if(last){
-        document.getElementById("amount").value = last.amt;
-        fromSel.value = last.from;
-        toSel.value = last.to;
-        document.getElementById("result").textContent = `= ${last.conv} ${last.to}`;
-      }
-      if('serviceWorker' in navigator){
-        navigator.serviceWorker.register("service-worker.js");
-      }
-    });
+    const themes = [
+      { bg: 'linear-gradient(to right, #4facfe, #00f2fe)', text: '#fff', card: 'rgba(255,255,255,0.1)', accent: '#00f2fe' },
+      { bg: 'linear-gradient(to right, #ff758c, #ff7eb3)', text: '#fff', card: 'rgba(255,255,255,0.2)', accent: '#ffb3c6' },
+      { bg: 'linear-gradient(to right, #0f2027, #203a43, #2c5364)', text: '#fff', card: '#1a1a1a', accent: '#5edfff' },
+      { bg: 'linear-gradient(to right, #c2e9fb, #a1c4fd)', text: '#222', card: 'rgba(255,255,255,0.5)', accent: '#30cfd0' },
+      { bg: 'linear-gradient(to right, #fbc2eb, #a6c1ee)', text: '#333', card: 'rgba(255,255,255,0.3)', accent: '#fbc2eb' },
+    ];
+
+    function setTheme(i) {
+      const t = themes[i];
+      document.documentElement.style.setProperty('--bg', t.bg);
+      document.documentElement.style.setProperty('--text', t.text);
+      document.documentElement.style.setProperty('--card', t.card);
+      document.documentElement.style.setProperty('--accent', t.accent);
+    }
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
   </script>
 </body>
 </html>
