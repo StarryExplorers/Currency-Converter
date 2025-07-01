@@ -1,10 +1,13 @@
 {
   "name": "Ultra Currency Converter",
-  "short_name": "Converter",
-  "start_url": "/Currency-Converter/",
+  "short_name": "Currency Converter",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#7f9cf5",
+  "orientation": "portrait",
+  "description": "Convert currencies instantly with style and real-time rates. 💱",
+  "id": "/",
   "icons": [
     {
       "src": "icon-192.png",
